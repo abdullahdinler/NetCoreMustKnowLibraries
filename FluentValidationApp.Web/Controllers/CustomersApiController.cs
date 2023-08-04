@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using FluentValidationApp.Web.Context;
+using FluentValidationApp.Web.Dtos;
 using FluentValidationApp.Web.Models;
 
 namespace FluentValidationApp.Web.Controllers
@@ -17,32 +19,28 @@ namespace FluentValidationApp.Web.Controllers
     {
         private readonly AppDbContext _context;
         private readonly IValidator<Customer> _validator;
+        private readonly IMapper _mapper;
 
-        public CustomersApiController(AppDbContext context, IValidator<Customer> validator)
+        public CustomersApiController(AppDbContext context, IValidator<Customer> validator, IMapper mapper)
         {
             _context = context;
             _validator = validator;
+            _mapper = mapper;
         }
 
         // GET: api/CustomersApi
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Customer>>> GetCustomers()
+        public async Task<ActionResult<List<CustomerDto>>> GetCustomers()
         {
-            if (_context.Customers == null)
-            {
-                return NotFound();
-            }
-            return await _context.Customers.ToListAsync();
+            var customers = await _context.Customers.ToListAsync();
+
+            return _mapper.Map<List<CustomerDto>>(customers);
         }
 
         // GET: api/CustomersApi/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Customer>> GetCustomer(int id)
         {
-            if (_context.Customers == null)
-            {
-                return NotFound();
-            }
             var customer = await _context.Customers.FindAsync(id);
 
             if (customer == null)

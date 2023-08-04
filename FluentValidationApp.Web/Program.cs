@@ -17,6 +17,10 @@ builder.Services.Configure<ApiBehaviorOptions>(opt =>
     opt.SuppressModelStateInvalidFilter = true;
 });
 
+// Burada AutoMapper'ý ekliyoruz.
+builder.Services.AddAutoMapper(typeof(AppDbContext));
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
